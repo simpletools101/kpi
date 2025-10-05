@@ -124,7 +124,7 @@ export function Footer() {
                     </div>
                 </div>
             </div>
-            <div className="w-full  h-[300px] flex items-center justify-center font-bold text-9xl">
+            <div className="w-full  h-[300px] flex items-center justify-center font-bold text-[200px]">
                 Trust
                 <span className="text-green-500">Bridge</span>
             </div>
