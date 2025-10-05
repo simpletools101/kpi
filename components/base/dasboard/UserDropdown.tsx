@@ -3,8 +3,11 @@
 import { useState, useEffect } from 'react'
 import { supabaseClient } from '@/lib/supabase/client'
 import { User } from 'lucide-react'
+import { useRouter } from 'next/navigation'
 
 export default function UserDropdown() {
+    const router = useRouter()
+
     const supabase = supabaseClient
     const [user, setUser] = useState<any>(null)
     const [open, setOpen] = useState(false)
@@ -20,6 +23,7 @@ export default function UserDropdown() {
     const handleLogout = async () => {
         await supabase.auth.signOut()
         setUser(null)
+        router.push('/main/auth/login')
     }
 
     if (!user) {
