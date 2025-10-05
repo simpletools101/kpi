@@ -4,8 +4,48 @@ import SearchBar from './SearchBar'
 import UserDropdown from './UserDropdown'
 import { Bell, Settings } from 'lucide-react'
 import { Button } from '@/components/ui/button'
+import UserAccountItem from '../user-account'
+import { supabaseClient } from '@/lib/supabase/client'
+import { useEffect, useState } from 'react'
+import { UserMetadata } from '@supabase/supabase-js'
+import { useRouter } from 'next/navigation'
+
+const supabase = supabaseClient
 
 export default function Navbar() {
+    const [userName, setUserName] = useState<string>('KPI')
+    const [userEmail, setUserEmail] = useState<string>('KPI')
+    const [userImage, setUserImage] = useState<string>('')
+    const [user, setUser] = useState<UserMetadata | null>(null)
+    const router = useRouter()
+
+    const onWillSignOutUser = async () => {
+        await supabaseClient.auth.signOut()
+        router.push('/main/auth/login')
+    }
+
+    useEffect(() => {
+        const onLoad = async () => {
+            const {
+                data: { user },
+            } = await supabaseClient.auth.getUser()
+
+            if (user) {
+                const name =
+                    user.identities![0]?.identity_data?.full_name ||
+                    user.user_metadata?.full_name ||
+                    user.user_metadata.fullName ||
+                    'KPI'
+                const avatar = user.identities![0]?.identity_data?.avatar_url || user.user_metadata?.avatar_url || ''
+                setUserName(name)
+                setUserImage(avatar)
+                setUserEmail(user.email!)
+            }
+        }
+
+        onLoad()
+    }, [])
+
     return (
         <nav className="bg-white border-b border-gray-200 px-6 py-3">
             <div className="flex items-center justify-between">
@@ -30,7 +70,12 @@ export default function Navbar() {
                     <button className="p-2 hover:bg-gray-100 rounded">
                         <Bell className="w-5 h-5 text-gray-700" />
                     </button>
-                    <UserDropdown />
+                    <UserAccountItem
+                        userEmail={userEmail}
+                        userImageSource={userImage}
+                        userName={userName}
+                        signOutUser={onWillSignOutUser}
+                    />
                     <button className="p-2 hover:bg-gray-100 rounded">
                         <Settings className="w-5 h-5 text-gray-700" />
                     </button>
